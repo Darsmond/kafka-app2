@@ -8,7 +8,6 @@ import com.kafkahomework.services.VehicleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,12 +23,12 @@ public class KafkaConsumer {
         this.vehicleService = vehicleService;
     }
 
-    @KafkaListener(topicPartitions = @TopicPartition(topic = "${topics.input}", partitions = {"0"}))
-    public void listen1(List<VehicleSignal> recordBatch) {
+    @KafkaListener(topics = "${topics.input}", concurrency = "3")
+    public void listen(List<VehicleSignal> recordBatch) {
         log.info("------------------------------------------");
         recordBatch.forEach(record -> {
             try {
-                log.info("First consumer listened to: " + mapper.writeValueAsString(recordBatch));
+                log.info("Consumer listened to: " + mapper.writeValueAsString(recordBatch));
                 vehicleService.calculate(record);
             } catch (JsonProcessingException e) {
                 log.error("Exception occurred during messages processing ", e);
@@ -38,33 +37,47 @@ public class KafkaConsumer {
         log.info("------------------------------------------");
     }
 
-    @KafkaListener(topicPartitions = @TopicPartition(topic = "${topics.input}", partitions = {"1"}))
-    public void listen2(List<VehicleSignal> recordBatch) {
-        log.info("------------------------------------------");
-        recordBatch.forEach(record -> {
-            try {
-                log.info("Second consumer listened to: " + mapper.writeValueAsString(recordBatch));
-                vehicleService.calculate(record);
-            } catch (JsonProcessingException e) {
-                log.error("Exception occurred during messages processing ", e);
-            }
-        });
-        log.info("------------------------------------------");
-    }
-
-    @KafkaListener(topicPartitions = @TopicPartition(topic = "${topics.input}", partitions = {"2"}))
-    public void listen3(List<VehicleSignal> recordBatch) {
-        log.info("------------------------------------------");
-        recordBatch.forEach(record -> {
-            try {
-                log.info("Third consumer listened to: " + mapper.writeValueAsString(recordBatch));
-                vehicleService.calculate(record);
-            } catch (JsonProcessingException e) {
-                log.error("Exception occurred during messages processing ", e);
-            }
-        });
-        log.info("------------------------------------------");
-    }
+//    @KafkaListener(topics = "${topics.input}")
+//    public void listen1(List<VehicleSignal> recordBatch) {
+//        log.info("------------------------------------------");
+//        recordBatch.forEach(record -> {
+//            try {
+//                log.info("First consumer listened to: " + mapper.writeValueAsString(recordBatch));
+//                vehicleService.calculate(record);
+//            } catch (JsonProcessingException e) {
+//                log.error("Exception occurred during messages processing ", e);
+//            }
+//        });
+//        log.info("------------------------------------------");
+//    }
+//
+//    @KafkaListener(topics = "${topics.input}")
+//    public void listen2(List<VehicleSignal> recordBatch) {
+//        log.info("------------------------------------------");
+//        recordBatch.forEach(record -> {
+//            try {
+//                log.info("Second consumer listened to: " + mapper.writeValueAsString(recordBatch));
+//                vehicleService.calculate(record);
+//            } catch (JsonProcessingException e) {
+//                log.error("Exception occurred during messages processing ", e);
+//            }
+//        });
+//        log.info("------------------------------------------");
+//    }
+//
+//    @KafkaListener(topics = "${topics.input}")
+//    public void listen3(List<VehicleSignal> recordBatch) {
+//        log.info("------------------------------------------");
+//        recordBatch.forEach(record -> {
+//            try {
+//                log.info("Third consumer listened to: " + mapper.writeValueAsString(recordBatch));
+//                vehicleService.calculate(record);
+//            } catch (JsonProcessingException e) {
+//                log.error("Exception occurred during messages processing ", e);
+//            }
+//        });
+//        log.info("------------------------------------------");
+//    }
 
     @KafkaListener(topics = "${topics.output}")
     public void listen4(List<VehicleDistance> recordBatch) {
